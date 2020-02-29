@@ -74,10 +74,20 @@ void loop() {
             break;
         case 2:
             strStartPos2 = "three  ";
-            break; 
-        default :
+            break;
+        case 3:
+            strStartPos2 = "four   ";
+            break;
+        case 4:
+            strStartPos2 = "five    ";
+            break;
+        case 5:
+            strStartPos2 = "Six     ";
+        default:    
+            break;
             strStartPos2 = "unknown";
     }
+
     switch(PosSwPosition){
         case 0:
             strStartPos = "one    ";
@@ -87,10 +97,19 @@ void loop() {
             break;
         case 2:
             strStartPos = "three  ";
-            break; 
-        default :
+            break;
+        case 3:
+            strStartPos2 = "four   ";
+            break;
+        case 4:
+            strStartPos2 = "five    ";
+            break;
+        case 5:
+            strStartPos2 = "Six     ";     
+        default:
             strStartPos = "unknown";
     }
+
    lcd.setCursor(10,0);
    lcd.print(strStartPos);
    lcd.setCursor(10,1);
