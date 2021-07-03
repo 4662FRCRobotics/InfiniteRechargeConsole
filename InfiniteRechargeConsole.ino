@@ -14,11 +14,11 @@
 * 3 * t/f 
 * see arduino joystick on github for more info 
 */
-Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,JOYSTICK_TYPE_GAMEPAD,
+Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,JOYSTICK_TYPE_JOYSTICK,
 0, 2,
-true, true, false, 
-false, false, false,  
-false, false,
+true, true, true, 
+false, false, false, 
+false, true,
 false, false, false);
 
 LiquidCrystal_I2C lcd(0x3F, 20, 4);
@@ -26,14 +26,14 @@ LiquidCrystal_I2C lcd(0x3F, 20, 4);
 int PosSwPin = A0;
 int PosSwMax = 1023;
 int PosSwMin = 0;
-int PosSwSegments = 5;
+int PosSwSegments = 7;
 int PosSwIncrement = PosSwMax / PosSwSegments;
 int PosSwMidPoint = PosSwIncrement / 2;
 int PosSwPosition = 0;
 int PosSwPin2 = A1;
 int PosSwMax2 = 1023;
 int PosSwMin2 = 0;
-int PosSwSegments2 = 5;
+int PosSwSegments2 = 7;
 int PosSwIncrement2 = PosSwMax / PosSwSegments;
 int PosSwMidPoint2 = PosSwIncrement / 2;
 int PosSwPosition2 = 0;
@@ -45,6 +45,13 @@ int TurnRateMin = 0;
 int IntakeCameraPin = A3;
 int IntakeCameraMax = 1023;
 int IntakeCameraMin = 0;
+
+int ShootSpeedPin = A4;
+int ShootSpeedMax = 1023;
+int ShootSpeedMin = 0;
+int ShootOffPin = A5;
+int ShootOffMax = 1023;
+int ShootOffMin = 0;
 
 String PosPatMap[6][6] = {
     {"X Auto              ", "X Auto              ", "X Auto              ", "-                   ", "-                   ", "-                   "},
@@ -61,13 +68,15 @@ void setup() {
   Joystick.begin();
   Joystick.setXAxisRange(0,1023);
   Joystick.setYAxisRange(0,1023);
+  Joystick.setZAxisRange(0,1023);
+  Joystick.setAcceleratorRange(0,1023);
   
   lcd.init();
   lcd.clear();
   lcd.setBacklight(255);
   
 }                                 
-  String strPosSwitchStatement = "V4 2021 1/18/2021";
+  String strPosSwitchStatement = "V4 2021 7/3/2021";
   String strAutoCommand = "";
                                  
 void loop() {
@@ -81,10 +90,10 @@ void loop() {
 
     int TurnRate = map(analogRead(TurnRatePin), 0, 1023, TurnRateMin, TurnRateMax);
     int CameraAngle = map(analogRead(IntakeCameraPin), 0, 1023, IntakeCameraMin, IntakeCameraMax);
+    int ShootSpeed = map(analogRead(ShootSpeedPin), 0, 1023, ShootSpeedMin, ShootSpeedMax);
+    int ShootOff = map(analogRead(ShootOffPin), 0, 1023, ShootOffMin, ShootOffMax);
    
-    lcd.print("StartPos:");
-    lcd.setCursor(0,1);
-    lcd.print("Pattern:");
+    lcd.print("Swtch:");
 
     String strStartPos = "one    ";
     String strStartPos2 = "one    ";
@@ -136,18 +145,31 @@ void loop() {
 
     strAutoCommand = PosPatMap[PosSwPosition2][PosSwPosition];
 
-   lcd.setCursor(10,0);
+   lcd.setCursor(6,0);
    lcd.print(strStartPos);
-   lcd.setCursor(10,1);
    lcd.print(strStartPos2);
-   lcd.setCursor(0, 2);
-   lcd.print("Auto Pattern:");
-   lcd.setCursor(0, 3);
+   lcd.setCursor(0,1);
    lcd.print(strAutoCommand);
+   lcd.setCursor(0, 2);
+   lcd.print("Turn:");
+   lcd.print(TurnRate);
+   lcd.print("   ");
+   lcd.setCursor(12, 2);
+   lcd.print("Cam:");
+   lcd.print(CameraAngle);
+   lcd.print("   ");
+   lcd.setCursor(0,3);
+   lcd.print("Shooter:");
+   lcd.print(ShootSpeed);
+   lcd.print(" ");
+   lcd.print(ShootOff);
+   lcd.print("   ");
 
    Joystick.setHatSwitch(0, PosSwPosition*45);
    Joystick.setHatSwitch(1, PosSwPosition2*45);
    Joystick.setXAxis(TurnRate);
    Joystick.setYAxis(CameraAngle);
+   Joystick.setZAxis(ShootSpeed);
+   Joystick.setAccelerator(ShootOff);
   
 }

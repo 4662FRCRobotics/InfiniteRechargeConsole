@@ -1,5 +1,5 @@
 {
-    "port": "COM15",
+    "port": "COM5",
     "board": "arduino:avr:leonardo",
     "programmer": "ArduinoISP",
     "sketch": "InfiniteRechargeConsole.ino"
