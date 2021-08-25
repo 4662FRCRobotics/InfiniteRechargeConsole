@@ -26,14 +26,14 @@ LiquidCrystal_I2C lcd(0x3F, 20, 4);
 int PosSwPin = A0;
 int PosSwMax = 1023;
 int PosSwMin = 0;
-int PosSwSegments = 7;
+int PosSwSegments = 5;
 int PosSwIncrement = PosSwMax / PosSwSegments;
 int PosSwMidPoint = PosSwIncrement / 2;
 int PosSwPosition = 0;
 int PosSwPin2 = A1;
 int PosSwMax2 = 1023;
 int PosSwMin2 = 0;
-int PosSwSegments2 = 7;
+int PosSwSegments2 = 5;
 int PosSwIncrement2 = PosSwMax / PosSwSegments;
 int PosSwMidPoint2 = PosSwIncrement / 2;
 int PosSwPosition2 = 0;
@@ -69,7 +69,7 @@ void setup() {
   Joystick.setXAxisRange(0,1023);
   Joystick.setYAxisRange(0,1023);
   Joystick.setZAxisRange(0,1023);
-  Joystick.setAcceleratorRange(0,1023);
+  Joystick.setThrottleRange(0,1023);
   
   lcd.init();
   lcd.clear();
@@ -170,6 +170,6 @@ void loop() {
    Joystick.setXAxis(TurnRate);
    Joystick.setYAxis(CameraAngle);
    Joystick.setZAxis(ShootSpeed);
-   Joystick.setAccelerator(ShootOff);
+   Joystick.setThrottle(ShootOff);
   
 }
