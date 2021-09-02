@@ -15,7 +15,7 @@
 * see arduino joystick on github for more info 
 */
 Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,JOYSTICK_TYPE_JOYSTICK,
-0, 2,
+1, 2,
 true, true, true, 
 false, false, false, 
 false, true,
@@ -53,6 +53,10 @@ int ShootOffPin = A5;
 int ShootOffMax = 1023;
 int ShootOffMin = 0;
 
+int climbAllowPin = 4;
+int climbLastState = 0;
+int climbButton = 0;
+
 String PosPatMap[6][6] = {
     {"X Auto              ", "X Auto              ", "X Auto              ", "-                   ", "-                   ", "-                   "},
     {"Shoot + X           ", "Shoot + X           ", "Shoot + X           ", "-                   ", "-                   ", "-                   "},
@@ -70,13 +74,15 @@ void setup() {
   Joystick.setYAxisRange(0,1023);
   Joystick.setZAxisRange(0,1023);
   Joystick.setThrottleRange(0,1023);
+
+  pinMode(climbAllowPin, INPUT_PULLUP);
   
   lcd.init();
   lcd.clear();
   lcd.setBacklight(255);
   
 }                                 
-  String strPosSwitchStatement = "V4 2021 7/3/2021";
+  String strPosSwitchStatement = "V5 2021 9/2/2021";
   String strAutoCommand = "";
                                  
 void loop() {
@@ -92,6 +98,12 @@ void loop() {
     int CameraAngle = map(analogRead(IntakeCameraPin), 0, 1023, IntakeCameraMin, IntakeCameraMax);
     int ShootSpeed = map(analogRead(ShootSpeedPin), 0, 1023, ShootSpeedMin, ShootSpeedMax);
     int ShootOff = map(analogRead(ShootOffPin), 0, 1023, ShootOffMin, ShootOffMax);
+
+    int currentClimbState = !digitalRead(climbAllowPin);
+    if (currentClimbState != climbLastState) {
+        Joystick.setButton(climbButton, currentClimbState);
+        climbLastState = currentClimbState;
+    }
    
     lcd.print("Swtch:");
 
@@ -171,5 +183,7 @@ void loop() {
    Joystick.setYAxis(CameraAngle);
    Joystick.setZAxis(ShootSpeed);
    Joystick.setThrottle(ShootOff);
+
+   delay(50);
   
 }
