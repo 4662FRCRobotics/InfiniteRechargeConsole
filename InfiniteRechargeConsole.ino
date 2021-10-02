@@ -14,8 +14,11 @@
 * 3 * t/f 
 * see arduino joystick on github for more info 
 */
+
+const int SWCount = 4;
+
 Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,JOYSTICK_TYPE_JOYSTICK,
-1, 2,
+SWCount, 2,
 true, true, true, 
 false, false, false, 
 false, true,
@@ -53,9 +56,13 @@ int ShootOffPin = A5;
 int ShootOffMax = 1023;
 int ShootOffMin = 0;
 
-int climbAllowPin = 4;
-int climbLastState = 0;
-int climbButton = 0;
+//int climbAllowPin = 4;
+//int climbLastState = 0;
+//int climbButton = 0;
+int SWPin [] = {4, 5, 6, 7};
+int SWButton [] = {0, 1, 2, 3};
+int SWLastState [] = {0, 0, 0, 0};
+int iSWIndex = 0;
 
 String PosPatMap[6][6] = {
     {"X Auto              ", "X Auto              ", "X Auto              ", "-                   ", "-                   ", "-                   "},
@@ -75,8 +82,12 @@ void setup() {
   Joystick.setZAxisRange(0,1023);
   Joystick.setThrottleRange(0,1023);
 
-  pinMode(climbAllowPin, INPUT_PULLUP);
-  
+  //pinMode(climbAllowPin, INPUT_PULLUP);
+  for (iSWIndex = 0; iSWIndex < SWCount; iSWIndex++) {
+    pinMode(SWPin[iSWIndex], INPUT_PULLUP);
+    Joystick.releaseButton(iSWIndex);
+  }
+
   lcd.init();
   lcd.clear();
   lcd.setBacklight(255);
@@ -99,43 +110,52 @@ void loop() {
     int ShootSpeed = map(analogRead(ShootSpeedPin), 0, 1023, ShootSpeedMin, ShootSpeedMax);
     int ShootOff = map(analogRead(ShootOffPin), 0, 1023, ShootOffMin, ShootOffMax);
 
-    int currentClimbState = !digitalRead(climbAllowPin);
-    if (currentClimbState != climbLastState) {
-        Joystick.setButton(climbButton, currentClimbState);
-        climbLastState = currentClimbState;
+    //int currentClimbState = !digitalRead(climbAllowPin);
+    //if (currentClimbState != climbLastState) {
+    //    Joystick.setButton(climbButton, currentClimbState);
+    //    climbLastState = currentClimbState;
+    //}
+    for (iSWIndex = 0; iSWIndex < SWCount; iSWIndex++) {
+    int SWCurrState = !digitalRead(SWPin[iSWIndex]);
+    if (SWCurrState != SWLastState[iSWIndex]) {
+      Joystick.setButton(SWButton[iSWIndex], SWCurrState);
+      SWLastState[iSWIndex] = SWCurrState;
     }
+    //sprintf(SWLine,"%1u%1u", SWButton[iSWIndex], SWLastState[iSWIndex]);
+    //strcat(println[3], SWLine);
+  }
    
     lcd.print("Swtch:");
 
     String strStartPos = "one    ";
     String strStartPos2 = "one    ";
 
-    switch(PosSwPosition2){
+    switch(PosSwPosition){
         case 0:
-            strStartPos2 = "one    ";
+            strStartPos2 = "left   ";
             break;
         case 1:
-            strStartPos2 = "two    ";
+            strStartPos2 = "middle ";
             break;
         case 2:
-            strStartPos2 = "three  ";
+            strStartPos2 = "right  ";
             break;
         case 3:
-            strStartPos2 = "four   ";
-            break;
+            strStartPos2 = "unk    ";
+            //break;
         case 4:
-            strStartPos2 = "five    ";
-            break;
+            strStartPos2 = "unk     ";
+            //break;
         case 5:
-            strStartPos2 = "Six     ";
+            strStartPos2 = "unk     ";
         default:    
-            break;
+            //break;
             strStartPos2 = "unknown";
     }
 
-    switch(PosSwPosition){
+    switch(PosSwPosition2){
         case 0:
-            strStartPos = "one    ";
+            strStartPos = "zero   ";
             break;
         case 1:
             strStartPos = "two    ";
@@ -150,18 +170,19 @@ void loop() {
             strStartPos = "five    ";
             break;
         case 5:
-            strStartPos = "Six     ";     
+            strStartPos = "Six     "; 
+            break;    
         default:
             strStartPos = "unknown";
     }
 
-    strAutoCommand = PosPatMap[PosSwPosition2][PosSwPosition];
+    //strAutoCommand = PosPatMap[PosSwPosition2][PosSwPosition];
 
    lcd.setCursor(6,0);
    lcd.print(strStartPos);
    lcd.print(strStartPos2);
    lcd.setCursor(0,1);
-   lcd.print(strAutoCommand);
+   //lcd.print(strAutoCommand);
    lcd.setCursor(0, 2);
    lcd.print("Turn:");
    lcd.print(TurnRate);
@@ -184,6 +205,6 @@ void loop() {
    Joystick.setZAxis(ShootSpeed);
    Joystick.setThrottle(ShootOff);
 
-   delay(50);
+   delay(20);
   
 }
